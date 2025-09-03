@@ -1,0 +1,8 @@
+[build]
+  publish = "static"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/predict"
+  to = "/.netlify/functions/get_prediction"
+  status = 200
