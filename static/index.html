@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kripto Prediktor (Netlify)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; background-color: #f4f4f9; color: #333; }
+        h1, h2 { text-align: center; color: #444; }
+        .prediction { text-align: center; font-size: 1.5em; margin: 20px; padding: 15px; background-color: #e0e7ff; border-radius: 8px; min-height: 50px; }
+        .prediction span { font-weight: bold; color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Kripto Árfolyam Prediktor</h1>
+    <h2>Bitcoin (BTC) árfolyamának előrejelzése USD-ben</h2>
+
+    <div class="prediction">
+        <span id="prediction-result">Adatok betöltése...</span>
+    </div>
+
+    <div>
+        <canvas id="priceChart"></canvas>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/predict');
+                if (!response.ok) {
+                    throw new Error(`Hiba a szerveren: ${response.statusText}`);
+                }
+                const data = await response.json();
+                document.getElementById('prediction-result').innerText = `$${data.prediction.toFixed(2)}`;
+                renderChart(data.labels, data.prices);
+            } catch (error) {
+                document.getElementById('prediction-result').innerText = 'Hiba történt az adatok betöltése közben.';
+                console.error(error);
+            }
+        });
+
+        function renderChart(labels, prices) {
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    label: 'Bitcoin Árfolyam (USD)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    data: prices,
+                    fill: true,
+                }]
+            };
+            const config = { type: 'line', data: chartData, options: { responsive: true } };
+            new Chart(document.getElementById('priceChart'), config);
+        }
+    </script>
+</body>
+</html>
